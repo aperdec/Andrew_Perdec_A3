@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Assignment 3</string>
+    <string name="my_social_networks">My Social Networks</string>
+    <string name="add_social_network">Add Social Network</string>
+    <string name="social_media_name">Site Name</string>
+    <string name="password">Password</string>
+    <string name="user_id">User Id</string>
+    <string name="remove_account">Remove Account</string>
+    <string name="update_account">Update Account</string>
+</resources>
