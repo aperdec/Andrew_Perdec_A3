@@ -23,9 +23,17 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<SocialMedia> socialMediaList;
     private ListView lstSocialMedia;
     private int arrayLocation;
+    private EditText input;
+
+    // String state variables defined
     private static String my_string = "socialMedia";
     private static String delete_string = "delete";
     private static String state_string = "saveMe";
+    private static String alert_dialog_state_string = "saveMeToo";
+    private static String alert_dialog_text_string = "theSaveMeTooText";
+
+    // Alert Dialog state
+    private boolean alertDialogOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +41,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Initialize the variables
-        socialMediaList = new ArrayList<SocialMedia>();
+        socialMediaList = new ArrayList<>();
         lstSocialMedia = (ListView) findViewById(R.id.lstSocialNetworks);
 
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             socialMediaList = savedInstanceState.getParcelableArrayList(state_string);
+            alertDialogOpen = savedInstanceState.getBoolean(alert_dialog_state_string);
+
+            // Repopulate list
             setList();
+
+            // Open the alert dialog if it were already open
+            if (alertDialogOpen) {
+                openAlertDialog();
+                input.setText(savedInstanceState.getString(alert_dialog_text_string));
+            }
         }
 
         // Add a click listener to the listview so that when an item is selected
@@ -85,33 +102,44 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        // Open alert dialog
+        openAlertDialog();
+
+        // Call function to populate the listview
+        setList();
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void openAlertDialog() {
+
+        // Save the alert dialog state
+        alertDialogOpen = true;
+
         // Build the dialog box
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         // Create the edit text component for the dialog box
-        final EditText input = new EditText(this);
+        input = new EditText(this);
 
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        // Fill the dialog box with all the required elements
+        // Fill the dialog box with all the required elements and display
         builder.setTitle("New Social Media").setView(input)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Add item to the social media array
                         socialMediaList.add(new SocialMedia(input.getText().toString()));
+                        alertDialogOpen = false;
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+                alertDialogOpen = false;
             }
         }).show();
-
-        // Call function to populate the listview
-        setList();
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -149,6 +177,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the arrayList to the savedInstanceState
         savedInstanceState.putParcelableArrayList(state_string, socialMediaList);
+
+        // If the alert dialog box is open save the state and text
+        if (alertDialogOpen) {
+            savedInstanceState.putBoolean(alert_dialog_state_string, alertDialogOpen);
+            savedInstanceState.putString(alert_dialog_text_string, input.getText().toString());
+        }
 
         super.onSaveInstanceState(savedInstanceState);
     }
